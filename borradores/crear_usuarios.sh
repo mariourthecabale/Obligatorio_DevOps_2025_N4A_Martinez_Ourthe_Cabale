@@ -1,6 +1,7 @@
 #!/bin/bash
 arch=$1
 usuarios_a_crear=$(cat $arch| wc -l)
+existe_directorio=""
 IFS="
 "
  
@@ -22,12 +23,22 @@ for i in $(cat $arch); do
             descripcion=""
         fi
  
-        if [ "$crear_directorio" == "SI" ]; then
-            useradd -c "$descripcion" -m -d "$directorio_home" -s "$shell" "$nombre_usuario"
-        elif [ "$crear_directorio" == "NO" ]; then
-            useradd -c "$descripcion" -d "$directorio_home" -s "$shell" "$nombre_usuario"
+
+        ##Crear directorio 
+        if [ -d "$directorio_home" ]; then
+            existe_directorio=$(echo $?)
+            echo $existe_directorio
         else
-            useradd -c "$descripcion" -s "$shell" "$nombre_usuario"    
+            existe_directorio=$(echo $?)
+            echo $existe_directorio
+        fi
+
+        if [ "$crear_directorio" == "SI" ] && [ $existe_directorio="1"]; then
+            useradd -c "$descripcion" -m -d "$directorio_home" -s "$shell" "$nombre_usuario"
+        elif [[ "$crear_directorio" == "NO" ] && [ $existe_directorio="0"]] || [[ "$crear_directorio" == "SI" ] && [ $existe_directorio="0"]]; then
+            useradd -c "$descripcion" -d "$directorio_home" -s "$shell" "$nombre_usuario"
+        elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio="1"]; then
+            echo "ATENCION: el usuario $nombre_usuario no pudo ser creado"    
         fi
  
         if $? -eq 0; then

@@ -1,0 +1,4 @@
+pepe:Este es mi amigo pepe:/home/jose:SI:/bin/bash
+papanatas:Este es un usuario trucho:/trucho:NO:/bin/sh
+elmaligno::/home/mourthec::/bin/el_maligno
+mario::/home/mourthec::/bin/el_maligno

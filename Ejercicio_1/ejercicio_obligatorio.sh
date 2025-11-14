@@ -93,7 +93,7 @@ function setear_passwd {
     #archivo de usuario creados con exito
     usuarios_creados="./logs/usuarios_creados.txt"
 
-    if ! [ $set_passwd ]; then
+    if [ $set_passwd ]; then
         if [ -z $password ]; then
             echo "No se puede colocar password a los usuarios"
         else
@@ -160,7 +160,7 @@ elif ! [ -s "$arch" ]; then
     
 fi
 
-##LLamamos a la funcion "crear_usuarios"
+##Llamamos a la funcion "crear_usuarios"
 crear_usuarios
 setear_passwd
 

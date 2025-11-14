@@ -3,16 +3,14 @@
 ##Definimos variables globales
 mostrar_info=false
 password=""
-arch=$1
-usuarios_a_crear=$(cat $arch| wc -l)
-cant_usuarios_creados=$(cat $arch| wc -l)
 existe_directorio=""
 set_passwd=false
 IFS="
 "
 mostrar_info=True
 function crear_usuarios {
-
+    usuarios_a_crear=$(cat $arch| wc -l)
+    cant_usuarios_creados=$(cat $arch| wc -l)
     for i in $(cat $arch); do
         nombre_usuario=$(echo $i | cut -d: -f1)
         descripcion=$(echo $i | cut -d: -f2)
@@ -113,6 +111,7 @@ fi
 
 
 ##Validacion de parametros pasados al script.
+
 while getopts "ic:" opt; do
     case "$opt" in
         i)
@@ -121,6 +120,7 @@ while getopts "ic:" opt; do
             ## y tambien cuando no pueda crear un usuario
             ##ejemplo: mostrar_info=1
             mostrar_info=true
+            echo "hola"
             ;;
         c)
             ##Verificar que se haya pasado el -c como parametro
@@ -140,8 +140,11 @@ done
 
 ##Al ejecutar getops, nos quedamos con el archivo pasado como parametro en $1
 shift $((OPTIND-1))
+echo $OPTIND
+echo $1
 
 ##Verificacion del tipo de archivo
+arch=$1
 if ! [ -f "$arch" ]; then
     echo "Solo se permiten archivos de tipo file"  >&2
     exit 3
@@ -150,9 +153,11 @@ elif ! [ -r $arch ]; then
     echo "el archivo no tiene permisos de lectura" >&2
     exit 4
 ##Verificacion de archivo no vacio    
-elif [ -z $(cat "$arch") ]; then
+elif ! [ -s "$arch" ]; then
     echo "El archivo esta vacio" >&2
     exit 5
+  
+    
 fi
 
 ##LLamamos a la funcion "crear_usuarios"

@@ -8,10 +8,11 @@ set_passwd=false
 IFS="
 "
 mostrar_info=True
+creado=""
 
 ##Función para ver si un usuario fue creado con exito
 function usuario_creado {
-    if [ "$?" -eq 0 ]; then
+    if [ $creado -eq 0 ]; then
         echo "$nombre_usuario" >> "./logs/usuarios_creados.txt"
         cant_usuarios_creados=$((cant_usuarios_creados + 1))
     else
@@ -29,38 +30,41 @@ function crear_usuarios {
         directorio_home=$(echo $i | cut -d: -f3)
         crear_directorio=$(echo $i| cut -d: -f4)
         shell=$(echo $i | cut -d: -f5)
-        ##Definimos la info por defecto a mostrar, en caso de que sea necesaria cambiarla por error al crear el usuario se cambiará su valor
-        info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
+        
+        
        
         ##Verificar si agregar shell, o dejarla por defecto
         if [ -z "$shell" ]; then
             shell="/bin/bash"            
-	fi
- 
-        if [ -z "$descripcion" ]; then
-            descripcion=""
-        fi
+	    fi
  
         ##Evaluamos si el directorio existe
         if [ -d "$directorio_home" ]; then
-            existe_directorio=$(echo $?)
+            existe_directorio=$(echo "$?")
         else
-            existe_directorio=$(echo $?)
+            existe_directorio="1"
+            directorio_home="/home/$nombre_usuario"
         fi
+
+        ##Definimos la info por defecto a mostrar, en caso de que sea necesaria cambiarla por error al crear el usuario se cambiará su valor
+        info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
 
         ##Evaluamos si descripción esta vacía o no
         if ! [ -z $descripcion ]; then
             ##Crear directorio si no existe y colocar el usuario dentro del mismo
             if [[ ("$crear_directorio" == "SI" && $existe_directorio -eq 1) ]]; then
                 useradd -c "$descripcion" -m -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                creado=$(echo "$?")
                 usuario_creado
             ##Agregar usuario a directorio existente
             elif [[ ("$crear_directorio" == "NO" && $existe_directorio -eq 0) || ("$crear_directorio" == "SI" &&  $existe_directorio -eq 0) || (-z "$crear_directorio" && $existe_directorio -eq 0) ]]; then
                 useradd -c "$descripcion" -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                creado=$(echo "$?")
                 usuario_creado
             ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
             elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
                 useradd -c "$descripcion" -s "$shell" "$nombre_usuario" 2>/dev/null
+                creado=$(echo "$?")
                 usuario_creado
             ##No se puede crear usuario
             ######## PENDIENTE VALIDAR QUE HACER CUANDO CAMPO "CREAR DIRECTORIO" CONTIENE CUALQUIER VERDURA
@@ -68,17 +72,21 @@ function crear_usuarios {
                 info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado")
             fi
         else
+            descripcion="No se le agrega comentario"
             #Crear directorio si no existe y colocar el usuario dentro del mismo
             if [[ ("$crear_directorio" == "SI" && $existe_directorio -eq 1) ]]; then
                 useradd -m -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                creado=$(echo "$?")
                 usuario_creado
             ##Agregar usuario a directorio existente
             elif [[ ("$crear_directorio" == "NO" && $existe_directorio -eq 0) || ("$crear_directorio" == "SI" &&  $existe_directorio -eq 0) || (-z "$crear_directorio" && $existe_directorio -eq 0) ]]; then
                 useradd -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                creado=$(echo "$?")
                  usuario_creado
             ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
             elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
                  useradd -s "$shell" "$nombre_usuario" 
+                 creado=$(echo "$?")
                  usuario_creado
             ##No se puede crear usuario
             ######## PENDIENTE VALIDAR QUE HACER CUANDO CAMPO "CREAR DIRECTORIO" CONTIENE CUALQUIER VERDURA
@@ -89,6 +97,7 @@ function crear_usuarios {
       
         ##Mostrar info, si "-i" esta presente
         if [ $mostrar_info = "true" ]; then
+            info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
             echo -e "$info\n"
         fi
     done
@@ -102,13 +111,9 @@ function setear_passwd {
     usuarios_creados="./logs/usuarios_creados.txt"
 
     if [ $set_passwd ]; then
-        if [ -z $password ]; then
-            echo "No se puede colocar password a los usuarios"
-        else
-            for i in $(cat $usuarios_creados); do
-                echo $i:$password | sudo chpasswd
-            done
-        fi
+        for i in $(cat $usuarios_creados); do
+            echo $i:$password | sudo chpasswd
+        done
     fi
     echo "" > "./logs/usuarios_creados.txt"
 }
@@ -134,8 +139,8 @@ while getopts "ic:" opt; do
             ##Verificar que se haya pasado el -c como parametro
             ##Asignar un valor que diga que hay que establecer una contraseña para todos los usuarios a crear
             ##Ejemplo, poner_contraseña=1, guardar argumento de la contraseña "password=-p $OPTARG"
-            set_passwd=true
             password=$OPTARG
+            setear_passwd=true          
             ;;
         *)
             ##Verificar que no haya ningun comando incorrecto, si lo hay se debe mostrar un mensaje con el error
@@ -147,10 +152,14 @@ while getopts "ic:" opt; do
 done
 
 ##Al ejecutar getops, nos quedamos con el archivo pasado como parametro en "$1"
-shift $((OPTIND-1))
-
+shift $((OPTIND - 1))
 ##Verificación del tipo de archivo
+#echo $1
 arch=$1
+if [ $arch==$password ]; then
+    echo "La contraseña pasada no es valida, se colocara la por defecto(devops)"
+    password="devops"
+fi
 if ! [ -f "$arch" ]; then
     echo "Solo se permiten archivos de tipo file"  >&2
     exit 3

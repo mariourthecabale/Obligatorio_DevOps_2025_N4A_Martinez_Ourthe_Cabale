@@ -1,14 +1,13 @@
+import os
 import boto3
 from botocore.exceptions import ClientError
 
 s3 = boto3.client('s3')
 
-# Parámetros por defecto
 bucket_name = 'obligatorio-devops-martinez-ourthe-cabale'
-file_path = 'archivo.txt'
-object_name = file_path.split('/')[-1]
+folder = './archivos/'
 
-# Parte 1: Crear un bucket de S3
+# Crear el bucket si no existe (cuenta con errores)
 try:
     s3.create_bucket(Bucket=bucket_name)
     print(f"Bucket creado: {bucket_name}")
@@ -18,3 +17,14 @@ except ClientError as e:
     else:
         print(f"Error creando bucket: {e}")
         exit(1)
+
+# Recorrer los archivos del folder y subirlos
+for filename in os.listdir(folder):
+    local_path = os.path.join(folder, filename)
+    object_name = f"archivos/{filename}"
+
+    try:
+        s3.upload_file(local_path, bucket_name, object_name)
+        print(f"Subido {local_path} → s3://{bucket_name}/{object_name}")
+    except ClientError as e:
+        print(f"Error subiendo {local_path}: {e}")

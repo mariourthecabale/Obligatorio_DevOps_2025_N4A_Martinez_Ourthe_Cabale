@@ -156,10 +156,6 @@ shift $((OPTIND - 1))
 ##Verificación del tipo de archivo
 #echo $1
 arch=$1
-if [ $arch==$password ]; then
-    echo "La contraseña pasada no es valida, se colocara la por defecto(devops)"
-    password="devops"
-fi
 if ! [ -f "$arch" ]; then
     echo "Solo se permiten archivos de tipo file"  >&2
     exit 3

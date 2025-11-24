@@ -4,4 +4,4 @@ malaso::/home/mourthec::/bin/malaso
 matias:Otro usuario mas:/home/matias:SI:
 mario:Mi amigo mario::NO:/bin/bash
 leonardo:::SI:/bin/bash
-pepe:Bienvenido pepe:/home/pepe:SI:
+pepe:Bienvenido pepe:/home/pepe:SI

@@ -9,6 +9,7 @@ IFS="
 "
 mostrar_info=True
 creado=""
+linea_ok=""
 
 ##Función para ver si un usuario fue creado con exito
 function usuario_creado {
@@ -31,73 +32,80 @@ function crear_usuarios {
         crear_directorio=$(echo $i| cut -d: -f4)
         shell=$(echo $i | cut -d: -f5)
         
+        ##Chequeo de que la linea a leer tenga los campos requeridos
+        
         
        
         ##Verificar si agregar shell, o dejarla por defecto
         if [ -z "$shell" ]; then
             shell="/bin/bash"            
-	    fi
- 
-        ##Evaluamos si el directorio existe
+	    elif ! (grep -q $shell /etc/shells); then
+            shell="/bin/bash"
+        fi
+
+        ##Evaluamos si el directorio existe, si no existe se le asigna el por defecto en caso que luego haya que crearlo.
         if [ -d "$directorio_home" ]; then
             existe_directorio=$(echo "$?")
-        else
+        elif [ -z $directorio_home ]; then
             existe_directorio="1"
             directorio_home="/home/$nombre_usuario"
+        else  
+            existe_directorio="1"
         fi
 
         ##Definimos la info por defecto a mostrar, en caso de que sea necesaria cambiarla por error al crear el usuario se cambiará su valor
         info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
 
-        ##Evaluamos si descripción esta vacía o no
-        if ! [ -z $descripcion ]; then
-            ##Crear directorio si no existe y colocar el usuario dentro del mismo
-            if [[ ("$crear_directorio" == "SI" && $existe_directorio -eq 1) ]]; then
-                useradd -c "$descripcion" -m -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
-                creado=$(echo "$?")
-                usuario_creado
-            ##Agregar usuario a directorio existente
-            elif [[ ("$crear_directorio" == "NO" && $existe_directorio -eq 0) || ("$crear_directorio" == "SI" &&  $existe_directorio -eq 0) || (-z "$crear_directorio" && $existe_directorio -eq 0) ]]; then
-                useradd -c "$descripcion" -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
-                creado=$(echo "$?")
-                usuario_creado
-            ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
-            elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
-                useradd -c "$descripcion" -s "$shell" "$nombre_usuario" 2>/dev/null
-                creado=$(echo "$?")
-                usuario_creado
-            ##No se puede crear usuario
-            ######## PENDIENTE VALIDAR QUE HACER CUANDO CAMPO "CREAR DIRECTORIO" CONTIENE CUALQUIER VERDURA
-            elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio -eq 1 ]; then
-                info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado")
+        if (echo $i | egrep -q ^.*:.*:.*:.*:.*$); then
+            ##Evaluamos si descripción esta vacía o no
+            if ! [ -z $descripcion ]; then
+                ##Crear directorio si no existe y colocar el usuario dentro del mismo
+                if [[ ("$crear_directorio" == "SI" && $existe_directorio -eq 1 && $linea_ok=0) ]]; then
+                    useradd -c "$descripcion" -m -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                    creado=$(echo "$?")
+                    usuario_creado
+                ##Agregar usuario a directorio existente
+                elif [[ ("$crear_directorio" == "NO" && $existe_directorio -eq 0) || ("$crear_directorio" == "SI" &&  $existe_directorio -eq 0) || (-z "$crear_directorio" && $existe_directorio -eq 0) ]]; then
+                    useradd -c "$descripcion" -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                    creado=$(echo "$?")
+                    usuario_creado
+                ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
+                elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
+                    useradd -c "$descripcion" -s "$shell" "$nombre_usuario" 2>/dev/null
+                    creado=$(echo "$?")
+                    usuario_creado
+                ##No se puede crear usuario
+                elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio -eq 1 ]; then
+                    info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado")
+                fi
+            else
+                #Crear directorio si no existe y colocar el usuario dentro del mismo
+                if [[ ("$crear_directorio" == "SI" && $existe_directorio -eq 1) ]]; then
+                    useradd -m -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                    creado=$(echo "$?")
+                    usuario_creado
+                ##Agregar usuario a directorio existente
+                elif [[ ("$crear_directorio" == "NO" && $existe_directorio -eq 0) || ("$crear_directorio" == "SI" &&  $existe_directorio -eq 0) || (-z "$crear_directorio" && $existe_directorio -eq 0) ]]; then
+                    useradd -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
+                    creado=$(echo "$?")
+                    usuario_creado
+                ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
+                elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
+                    useradd -s "$shell" "$nombre_usuario" 
+                    creado=$(echo "$?")
+                    usuario_creado
+                ##No se puede crear usuario
+                ######## PENDIENTE VALIDAR QUE HACER CUANDO CAMPO "CREAR DIRECTORIO" CONTIENE CUALQUIER VERDURA
+                elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio -eq 1 ]; then
+                    info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado $nombre_usuario")  
+                fi
             fi
         else
-            descripcion="No se le agrega comentario"
-            #Crear directorio si no existe y colocar el usuario dentro del mismo
-            if [[ ("$crear_directorio" == "SI" && $existe_directorio -eq 1) ]]; then
-                useradd -m -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
-                creado=$(echo "$?")
-                usuario_creado
-            ##Agregar usuario a directorio existente
-            elif [[ ("$crear_directorio" == "NO" && $existe_directorio -eq 0) || ("$crear_directorio" == "SI" &&  $existe_directorio -eq 0) || (-z "$crear_directorio" && $existe_directorio -eq 0) ]]; then
-                useradd -d "$directorio_home" -s "$shell" "$nombre_usuario" 2>/dev/null
-                creado=$(echo "$?")
-                 usuario_creado
-            ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
-            elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
-                 useradd -s "$shell" "$nombre_usuario" 
-                 creado=$(echo "$?")
-                 usuario_creado
-            ##No se puede crear usuario
-            ######## PENDIENTE VALIDAR QUE HACER CUANDO CAMPO "CREAR DIRECTORIO" CONTIENE CUALQUIER VERDURA
-            elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio -eq 1 ]; then
-                info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado $nombre_usuario")  
-            fi
-        fi  
+            info="El usuario $nombre_usuario no puede ser creado ya que la linea no cumple con la cantidad de campos solicitados"
+        fi      
       
         ##Mostrar info, si "-i" esta presente
         if [ $mostrar_info = "true" ]; then
-            info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
             echo -e "$info\n"
         fi
     done

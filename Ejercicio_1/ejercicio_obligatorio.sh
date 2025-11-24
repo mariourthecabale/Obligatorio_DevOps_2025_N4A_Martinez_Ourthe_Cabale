@@ -42,7 +42,6 @@ function crear_usuarios {
 	    elif ! (grep -q $shell /etc/shells); then
             shell="/bin/bash"
         fi
-
         ##Evaluamos si el directorio existe, si no existe se le asigna el por defecto en caso que luego haya que crearlo.
         if [ -d "$directorio_home" ]; then
             existe_directorio=$(echo "$?")
@@ -55,8 +54,24 @@ function crear_usuarios {
 
         ##Definimos la info por defecto a mostrar, en caso de que sea necesaria cambiarla por error al crear el usuario se cambiará su valor
         info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
+        
+        ##Validando nombre de usuario.
+        if [ -z $nombre_usuario ]; then
+            info="Campo nombre de usuario invalido, se encuentra vacío"
+        fi
 
-        if (echo $i | egrep -q ^.*:.*:.*:.*:.*$); then
+
+        if [ -z $crear_directorio ]; then
+            crear_directorio="SI"
+        elif ! [[ ($crear_directorio="SI") || ($crear_directorio="NO") ]]; then
+            info="El usuario $nombre_usuario no puede ser creado, campo crear directorio no es valido."
+        fi
+
+
+    
+
+        
+        if (echo $i | egrep -q ^.+:.*:.*:.*:.*$); then
             ##Evaluamos si descripción esta vacía o no
             if ! [ -z $descripcion ]; then
                 ##Crear directorio si no existe y colocar el usuario dentro del mismo
@@ -100,7 +115,7 @@ function crear_usuarios {
                     info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado $nombre_usuario")  
                 fi
             fi
-        else
+        elif ! [ -z $nombre_usuario ]; then
             info="El usuario $nombre_usuario no puede ser creado ya que la linea no cumple con la cantidad de campos solicitados"
         fi      
       

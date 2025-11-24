@@ -1,7 +1,8 @@
-ana:Este es mi amiga ana:/home/anita:SI:/bin/bash
+ana:Esta es mi amiga ana:/home/anita:SI:/bin/bash
 quiricocho:Este es un usuario de mentira:/mentira:NO:/bin/sh
 malaso::/home/mourthec::/bin/malaso
 matias:Otro usuario mas:/home/matias:SI:
 mario:Mi amigo mario::NO:/bin/bash
 leonardo:::SI:/bin/bash
 pepe:Bienvenido pepe:/home/pepe:SI
+:Usuario sin nombre::SI:/bin/bash

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 ##Definimos variables globales
 mostrar_info=false
 password=""
@@ -10,7 +10,7 @@ IFS="
 mostrar_info=True
 creado=""
 linea_ok=""
-
+ 
 ##Función para ver si un usuario fue creado con exito
 function usuario_creado {
     if [ $creado -eq 0 ]; then
@@ -20,7 +20,7 @@ function usuario_creado {
         info="Usuario $nombre_usuario ya existe"
     fi  
 }
-
+ 
 ##Función para crear usuarios
 function crear_usuarios {
     usuarios_a_crear=$(cat $arch| wc -l)
@@ -31,18 +31,17 @@ function crear_usuarios {
         directorio_home=$(echo $i | cut -d: -f3)
         crear_directorio=$(echo $i| cut -d: -f4)
         shell=$(echo $i | cut -d: -f5)
-        
+       
         ##Chequeo de que la linea a leer tenga los campos requeridos
-        
-        
+       
+       
        
         ##Verificar si agregar shell, o dejarla por defecto
         if [ -z "$shell" ]; then
             shell="/bin/bash"            
-	    elif ! (grep -q $shell /etc/shells); then
+        elif ! (grep -q $shell /etc/shells); then
             shell="/bin/bash"
         fi
-
         ##Evaluamos si el directorio existe, si no existe se le asigna el por defecto en caso que luego haya que crearlo.
         if [ -d "$directorio_home" ]; then
             existe_directorio=$(echo "$?")
@@ -52,11 +51,27 @@ function crear_usuarios {
         else  
             existe_directorio="1"
         fi
-
+ 
         ##Definimos la info por defecto a mostrar, en caso de que sea necesaria cambiarla por error al crear el usuario se cambiará su valor
-        info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell") 
-
-        if (echo $i | egrep -q ^.*:.*:.*:.*:.*$); then
+        info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell")
+       
+        ##Validando nombre de usuario.
+        if [ -z $nombre_usuario ]; then
+            info="Campo nombre de usuario invalido, se encuentra vacío"
+        fi
+ 
+ 
+        if [ -z $crear_directorio ]; then
+            crear_directorio="SI"
+        elif ! [[ ($crear_directorio="SI") || ($crear_directorio="NO") ]]; then
+            info="El usuario $nombre_usuario no puede ser creado, campo crear directorio no es valido."
+        fi
+ 
+ 
+   
+ 
+       
+        if (echo $i | egrep -q ^.+:.*:.*:.*:.*$); then
             ##Evaluamos si descripción esta vacía o no
             if ! [ -z $descripcion ]; then
                 ##Crear directorio si no existe y colocar el usuario dentro del mismo
@@ -91,7 +106,7 @@ function crear_usuarios {
                     usuario_creado
                 ##Crear directorio home por defecto, si campo "crear_directorio" está vacío.
                 elif [[ (-z "$crear_directorio" && $existe_directorio -eq 1) ]]; then
-                    useradd -s "$shell" "$nombre_usuario" 
+                    useradd -s "$shell" "$nombre_usuario"
                     creado=$(echo "$?")
                     usuario_creado
                 ##No se puede crear usuario
@@ -100,10 +115,10 @@ function crear_usuarios {
                     info=$(echo "ATENCION: el usuario $nombre_usuario no pudo ser creado $nombre_usuario")  
                 fi
             fi
-        else
+        elif ! [ -z $nombre_usuario ]; then
             info="El usuario $nombre_usuario no puede ser creado ya que la linea no cumple con la cantidad de campos solicitados"
         fi      
-      
+     
         ##Mostrar info, si "-i" esta presente
         if [ $mostrar_info = "true" ]; then
             echo -e "$info\n"
@@ -112,12 +127,12 @@ function crear_usuarios {
     ##Mostrar la cantidad de usuarios creados con exito
     echo -e "\nSe han creado $cant_usuarios_creados usuarios con éxito."
 }
-
+ 
 ##Función para colocarle a cada usuario creado con exito la contraseña pasada como argumento de "-c"
 function setear_passwd {
     #Archivo de usuario creados con exito
     usuarios_creados="./logs/usuarios_creados.txt"
-
+ 
     if [ $set_passwd ]; then
         for i in $(cat $usuarios_creados); do
             echo $i:$password | sudo chpasswd
@@ -125,15 +140,15 @@ function setear_passwd {
     fi
     echo "" > "./logs/usuarios_creados.txt"
 }
-
+ 
 ##Validar que al menos recibe un parámetro
 if [ "$#" -eq 0 ]; then
     echo "Ingrese parametros"
     exit 1    
 fi
-
+ 
 ##Validación de parámetros pasados al script.
-
+ 
 while getopts "ic:" opt; do
     case "$opt" in
         i)
@@ -156,9 +171,9 @@ while getopts "ic:" opt; do
             echo "Los parametros son incorrectos" >&2
             exit 2
             ;;
-    esac 
+    esac
 done
-
+ 
 ##Al ejecutar getops, nos quedamos con el archivo pasado como parametro en "$1"
 shift $((OPTIND - 1))
 ##Verificación del tipo de archivo
@@ -175,9 +190,10 @@ elif ! [ -r $arch ]; then
 elif ! [ -s "$arch" ]; then
     echo "El archivo esta vacio" >&2
     exit 5
-      
+     
 fi
-
+ 
 ##Llamamos a la función "crear_usuarios"
 crear_usuarios
 setear_passwd
+ 

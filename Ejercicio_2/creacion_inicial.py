@@ -13,15 +13,6 @@ ec2 = boto3.client("ec2", region_name="us-east-1")
 bucket_name = 'obligatorio-devops-martinez-ourthe-cabale'
 folder = './archivos/'
 
-# Obtenemos VPC ID
-try:
-    vpcs = ec2.describe_vpcs(Filters=[{'Name': 'isDefault', 'Values': ['true']}])
-    vpc_id = vpcs['Vpcs'][0]['VpcId']
-    print(f"Usando VPC ID: {vpc_id}")
-except Exception:
-    print("No se pudo obtener la VPC por defecto. Verifica tu región o cuenta.")
-    exit(1)
-
 ##Creamos el bucket
 try:
     # Verificar si el bucket existe
@@ -53,21 +44,20 @@ for filename in os.listdir(folder):
         print(f"Error subiendo {local_path}: {e}")
 
 AMI = 'ami-06b21ccaeff8cd686' 
-SG_NAME_HTTP = 'http-sg'
+SG_NAME_HTTP = 'http-sg-2'
 DESCRIPTION_HTTP = 'Security group conexion http para mi instancia EC2'
 INSTANCE_NAME = 'Http-server' 
 
-SG_NAME_MYSQL = 'mysql-sg'
+SG_NAME_MYSQL = 'mysql-sg-2'
 DESCRIPTION_MYSQL = 'Security group conexion mysql para mi instancia EC2'
 
 
 # Crear primer Security Group http
-sg_name_1 = 'http-sg'
+
 try:
     response = ec2.create_security_group(
     GroupName=SG_NAME_HTTP,
     Description=DESCRIPTION_HTTP,
-    VpcId=vpc_id
     )
     sg_id_1 = response['GroupId']
     print(f"Security Group creado: {sg_id_1}")
@@ -86,24 +76,24 @@ try:
     )
 except ClientError as e:
     if 'InvalidGroup.Duplicate' in str(e):
-        sg_id_1 = ec2.describe_security_groups(GroupNames=[sg_name_1])['SecurityGroups'][0]['GroupId']
+        sg_id_1 = ec2.describe_security_groups(GroupNames=[SG_NAME_HTTP])['SecurityGroups'][0]['GroupId']
         print(f"Security Group ya existe: {sg_id_1}")
     else:
         raise
 
+
+
 # Crear segundo Security Group
-sg_name_2 = 'mysql-sg'
 try:
     response = ec2.create_security_group(
     GroupName=SG_NAME_MYSQL,
     Description=DESCRIPTION_MYSQL,
-    VpcId=vpc_id
     )
     sg_id_2 = response['GroupId']
     print(f"Security Group creado: {sg_id_2}")
 
     # Permitir conexión mysql (puerto 3306)
-    rds.authorize_security_group_ingress(
+    ec2.authorize_security_group_ingress(
         GroupId=sg_id_2,
         IpPermissions=[
             {
@@ -116,7 +106,7 @@ try:
     )
 except ClientError as e:
     if 'InvalidGroup.Duplicate' in str(e):
-        sg_id_2 = rds.describe_security_groups(GroupNames=[sg_name_2])['SecurityGroups'][0]['GroupId']
+        sg_id_2 = ec2.describe_security_groups(GroupNames=[SG_NAME_MYSQL])['SecurityGroups'][0]['GroupId']
         print(f"Security Group ya existe: {sg_id_2}")
     else:
         raise
@@ -211,7 +201,7 @@ try:
     rds.create_db_instance(
         DBInstanceIdentifier=DB_INSTANCE_ID,
         AllocatedStorage=20,
-        DBSecurityGroups=[sg_id_2],
+        VpcSecurityGroupIds=[sg_id_2],
         DBInstanceClass='db.t3.micro',
         Engine='mysql',
         MasterUsername=DB_USER,
@@ -238,10 +228,10 @@ try:
         DBInstanceIdentifier=DB_INSTANCE_ID
     )
     db_instance = response_rds['DBInstances'][0]
-    endpoint_address = db_instance['Endpoint']['Address']
+    ENDOPOINT_ADDRESS = db_instance['Endpoint']['Address']
 
     command = (
-    f"mysql -h {endpoint_address} -u {DB_USER} -p {DB_PASS} {DB_NAME} < /var/www/init_db.sql"
+    f"mysql -h {ENDOPOINT_ADDRESS} -u {DB_USER} -p{DB_PASS} {DB_NAME} < /var/www/init_db.sql"
     )
     send_response = ssm.send_command(
     InstanceIds=[instance_id],

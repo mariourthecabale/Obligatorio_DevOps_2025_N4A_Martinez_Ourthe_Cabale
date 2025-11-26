@@ -39,7 +39,7 @@ waiter = ec2.get_waiter('instance_running')
 waiter.wait(InstanceIds=[instance_id])
 print("Instancia ahora está running")
 
-# Esperar un poco para que el agente SSM se registre (ajustá este sleep según lo que veas que demora)
+# Esperar un poco para que el agente SSM se registre
 time.sleep(60)
 
 # Enviar comando via SSM

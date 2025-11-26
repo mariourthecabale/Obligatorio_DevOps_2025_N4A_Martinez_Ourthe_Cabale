@@ -6,3 +6,4 @@ mario:Mi amigo mario::NO:/bin/bash
 leonardo:::SI:/bin/bash
 pepe:Bienvenido pepe:/home/pepe:SI
 :Usuario sin nombre::SI:/bin/bash
+pepe:Usuario repetido:/home/pepe:SI:/bin/bash

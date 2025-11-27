@@ -28,9 +28,9 @@ function crear_usuarios {
     for i in $(cat $arch); do
         nombre_usuario=$(echo $i | cut -d: -f1)
         descripcion=$(echo $i | cut -d: -f2)
-        directorio_home=$(echo $i | cut -d: -f3)
-        crear_directorio=$(echo $i| cut -d: -f4)
-        shell=$(echo $i | cut -d: -f5)
+        directorio_home=$(echo $i | cut -d: -f3 | awk '{print toupper($0)}') 
+        crear_directorio=$(echo $i| cut -d: -f4 | awk '{print toupper($0)}')
+        shell=$(echo $i | cut -d: -f5 | awk '{print toupper($0)}')
        
         ##Chequeo de que la línea a leer tenga los campos requeridos
         ##Verificar si agregar shell, o dejarla por defecto.
@@ -56,13 +56,13 @@ function crear_usuarios {
         if [ -z $nombre_usuario ]; then
             info="ATENCIÓN: Campo nombre de usuario invalido, se encuentra vacío"
         fi
- 
         if [ -z $crear_directorio ]; then
             crear_directorio="SI"
-        elif ! [[ ($crear_directorio="SI") || ($crear_directorio="NO") ]]; then
+            #echo $info
+        elif ! [[ ($crear_directorio == "SI") || ($crear_directorio == "NO") ]]; then
             info="ATENCIÓN: El usuario $nombre_usuario no puede ser creado, campo crear directorio no es valido."
         fi
-       
+        
         if (echo $i | egrep -q ^.+:.*:.*:.*:.*$); then
             ##Evaluamos si descripción esta vacía o no.
             if ! [ -z $descripcion ]; then

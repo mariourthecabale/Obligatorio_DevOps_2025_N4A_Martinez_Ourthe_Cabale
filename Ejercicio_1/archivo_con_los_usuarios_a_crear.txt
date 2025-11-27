@@ -1,11 +1,1 @@
-ana:Esta es mi amiga ana:/home/anita:SI:/bin/bash
-quiricocho:Este es un usuario de mentira:/mentira:NO:/bin/sh
-malaso::/home/mourthec::/bin/malaso
-matias:Otro usuario mas:/home/matias:SI:
-mario:Mi amigo mario::NO:/bin/bash
-leonardo:::SI:/bin/bash
-pepe:Campos incompletos:/home/pepe:SI
-:Usuario sin nombre::SI:/bin/bash
-pepe:Ahora si debe crearse:/home/pepe:SI:/bin/bash
-ana:Usuario repetido:/home/anita:SI:/bin/bash
-jose:debe fallar::OK:/bin/bash
+jose:debe fallar::si:/bin/bash

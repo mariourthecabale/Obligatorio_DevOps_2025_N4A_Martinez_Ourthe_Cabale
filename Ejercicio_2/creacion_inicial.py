@@ -10,7 +10,7 @@ rds = boto3.client('rds')
 # Seleccionamos la región
 ec2 = boto3.client("ec2", region_name="us-east-1")
 # Defino variable de nombre del bucket y carpeta a crear
-bucket_name = 'obligatorio-devops-martinez-ourthe-cabale'
+bucket_name = 'obligatorio-devops-martinez-ourthe-cabalee'
 folder = './archivos/'
 
 ##Creamos el bucket
@@ -246,27 +246,26 @@ except ClientError as e:
     print("Error esperando por RDS:", e)
     raise
 
+script = """sudo tee /var/www/.env >/dev/null <<'ENV'
+DB_HOST=<ENDPOINT>
+DB_NAME=<DB_NAME>
+DB_USER=<DB_USER>
+DB_PASS=<DB_PASS>
+
+APP_USER=<APP_USER>
+APP_PASS=<APP_PASS>
+ENV
+
+sudo chown apache:apache /var/www/.env
+sudo chmod 600 /var/www/.env
+"""
+
 send_response = ssm.send_command(
     InstanceIds=[instance_id],
     DocumentName='AWS-RunShellScript',
     Parameters={
-        'commands': [ 
-            """
-            sudo tee /var/www/.env >/dev/null <<'ENV'
-   DB_HOST=ENDOPOINT_ADDRESS
-   DB_NAME=DB_NAME
-   DB_USER=DB_USER
-   DB_PASS=DB_PASS
-   APP_USER=admin
-   APP_PASS=admin123
-   ENV
-
-   sudo chown apache:apache /var/www/.env
-   sudo chmod 600 /var/www/.env
-
-   sudo systemctl restart httpd php-fpm
-   """
-        ]
+        'commands': [script]
     }
 )
+
   

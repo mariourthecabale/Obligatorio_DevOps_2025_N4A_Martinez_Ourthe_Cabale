@@ -153,7 +153,8 @@ send_response = ssm.send_command(
     DocumentName='AWS-RunShellScript',
     Parameters={
         'commands': [
-            'aws s3 cp s3://obligatorio-devops-martinez-ourthe-cabale/archivos/ /var/www/html --recursive --exclude "*.sql" --exclude "README.md" && aws s3 cp s3://obligatorio-devops-martinez-ourthe-cabale/archivos/ /var/www/ --recursive --exclude "*" --include "*.sql" --include ".env"'
+            'aws s3 cp s3://obligatorio-devops-martinez-ourthe-cabale/archivos/ /var/www/html --recursive --exclude "*.sql" --exclude "README.md" && aws s3 cp s3://obligatorio-devops-martinez-ourthe-cabale/archivos/ /var/www/ --recursive --exclude "*" --include "*.sql" --include ".env"',
+            'sudo chown -R apache:apache /var/www/html'
         ]
     }
 )
@@ -240,7 +241,32 @@ try:
         'commands': [command]
     }
 )
-    
+
 except ClientError as e:
     print("Error esperando por RDS:", e)
     raise
+
+send_response = ssm.send_command(
+    InstanceIds=[instance_id],
+    DocumentName='AWS-RunShellScript',
+    Parameters={
+        'commands': [ 
+            """
+            sudo tee /var/www/.env >/dev/null <<'ENV'
+   DB_HOST=ENDOPOINT_ADDRESS
+   DB_NAME=DB_NAME
+   DB_USER=DB_USER
+   DB_PASS=DB_PASS
+   APP_USER=admin
+   APP_PASS=admin123
+   ENV
+
+   sudo chown apache:apache /var/www/.env
+   sudo chmod 600 /var/www/.env
+
+   sudo systemctl restart httpd php-fpm
+   """
+        ]
+    }
+)
+  

@@ -4,6 +4,8 @@ malaso::/home/mourthec::/bin/malaso
 matias:Otro usuario mas:/home/matias:SI:
 mario:Mi amigo mario::NO:/bin/bash
 leonardo:::SI:/bin/bash
-pepe:Bienvenido pepe:/home/pepe:SI
+pepe:Campos incompletos:/home/pepe:SI
 :Usuario sin nombre::SI:/bin/bash
-pepe:Usuario repetido:/home/pepe:SI:/bin/bash
+pepe:Ahora si debe crearse:/home/pepe:SI:/bin/bash
+ana:Usuario repetido:/home/anita:SI:/bin/bash
+jose:debe fallar::OK:/bin/bash

@@ -17,7 +17,7 @@ function usuario_creado {
         echo "$nombre_usuario" >> "./logs/usuarios_creados.txt"
         cant_usuarios_creados=$((cant_usuarios_creados + 1))
     else
-        info="Usuario $nombre_usuario ya existe"
+        info="¡Usuario $nombre_usuario ya existe!"
     fi  
 }
  
@@ -54,13 +54,13 @@ function crear_usuarios {
        
         ##Validando nombre de usuario.
         if [ -z $nombre_usuario ]; then
-            info="ATENCIÓN: Campo nombre de usuario invalido, se encuentra vacío"
+            info="¡ATENCIÓN!: Campo nombre de usuario invalido, se encuentra vacío"
         fi
         if [ -z $crear_directorio ]; then
             crear_directorio="SI"
             #echo $info
         elif ! [[ ($crear_directorio == "SI") || ($crear_directorio == "NO") ]]; then
-            info="ATENCIÓN: El usuario $nombre_usuario no puede ser creado, campo crear directorio no es valido."
+            info="¡ATENCIÓN!: El usuario $nombre_usuario no puede ser creado, campo crear directorio no es valido."
         fi
         
         if (echo $i | egrep -q ^.+:.*:.*:.*:.*$); then
@@ -83,7 +83,7 @@ function crear_usuarios {
                     usuario_creado
                 ##No se puede crear usuario.
                 elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio -eq 1 ]; then
-                    info=$(echo "ATENCIÓN: El usuario $nombre_usuario no pudo ser creado")
+                    info=$(echo "¡ATENCIÓN!: El usuario $nombre_usuario no pudo ser creado")
                 fi
             else
                 #Crear directorio si no existe y colocar el usuario dentro del mismo.
@@ -102,13 +102,12 @@ function crear_usuarios {
                     creado=$(echo "$?")
                     usuario_creado
                 ##No se puede crear usuario.
-                ######## PENDIENTE VALIDAR QUE HACER CUANDO CAMPO "CREAR DIRECTORIO" CONTIENE CUALQUIER VERDURA
                 elif [ "$crear_directorio" == "NO" ] && [ $existe_directorio -eq 1 ]; then
-                    info=$(echo "ATENCIÓN: El usuario $nombre_usuario no pudo ser creado $nombre_usuario")  
+                    info=$(echo "¡ATENCIÓN!: El usuario $nombre_usuario no pudo ser creado $nombre_usuario")  
                 fi
             fi
         elif ! [ -z $nombre_usuario ]; then
-            info="ATENCIÓN: El usuario $nombre_usuario no puede ser creado ya que la linea no cumple con la cantidad de campos solicitados"
+            info="¡ATENCIÓN!: El usuario $nombre_usuario no puede ser creado ya que la linea no cumple con la cantidad de campos solicitados"
         fi      
      
         ##Mostrar info, si "-i" esta presente.
@@ -133,7 +132,7 @@ function setear_passwd {
 }
 ##Validar que al menos recibe un parámetro.
 if [ "$#" -eq 0 ]; then
-    echo "Ingrese parametros"
+    echo "¡Ingrese parametros!"
     exit 1    
 fi
 ##Validación de parámetros pasados al script.
@@ -156,7 +155,7 @@ while getopts "ic:" opt; do
         *)
             ##Verificar que no haya ningun comando incorrecto, si lo hay se debe mostrar un mensaje con el error
             ##Asignar un codigo de salida "exit 1".
-            echo "Los parametros son incorrectos" >&2
+            echo "¡Los parametros son incorrectos!" >&2
             exit 2
             ;;
     esac
@@ -167,18 +166,17 @@ shift $((OPTIND - 1))
 #echo $1
 arch=$1
 if ! [ -f "$arch" ]; then
-    echo "Solo se permiten archivos de tipo file"  >&2
+    echo "¡Solo se permiten archivos de tipo file!"  >&2
     exit 3
 ##Verficación de permiso lectura del archivo.
 elif ! [ -r $arch ]; then
-    echo "El archivo no tiene permisos de lectura" >&2
+    echo "¡El archivo no tiene permisos de lectura!" >&2
     exit 4
 ##Verificación de archivo no vacío.
 elif ! [ -s "$arch" ]; then
-    echo "El archivo esta vacio" >&2
+    echo "¡El archivo esta vacío!" >&2
     exit 5  
 fi
 ##Llamamos a la función "crear_usuarios" y "setear_passwd".
 crear_usuarios
 setear_passwd
- 

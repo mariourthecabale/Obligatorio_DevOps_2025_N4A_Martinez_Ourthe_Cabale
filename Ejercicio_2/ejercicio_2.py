@@ -229,10 +229,10 @@ try:
         DBInstanceIdentifier=DB_INSTANCE_ID
     )
     db_instance = response_rds['DBInstances'][0]
-    ENDOPOINT_ADDRESS = db_instance['Endpoint']['Address']
+    ENDPOINT_ADDRESS = db_instance['Endpoint']['Address']
 
     command = (
-    f"mysql -h {ENDOPOINT_ADDRESS} -u {DB_USER} -p{DB_PASS} {DB_NAME} < /var/www/init_db.sql"
+    f"mysql -h {ENDPOINT_ADDRESS} -u {DB_USER} -p{DB_PASS} {DB_NAME} < /var/www/init_db.sql"
     )
     send_response = ssm.send_command(
     InstanceIds=[instance_id],
@@ -247,7 +247,7 @@ except ClientError as e:
     raise
 
 script = f"""sudo tee /var/www/.env >/dev/null <<'ENV'
-DB_HOST={ENDOPOINT_ADDRESS}
+DB_HOST={ENDPOINT_ADDRESS}
 DB_NAME={DB_NAME}
 DB_USER={DB_USER}
 DB_PASS={DB_PASS}
@@ -266,5 +266,3 @@ send_response = ssm.send_command(
         'commands': [script]
     }
 )
-
-  

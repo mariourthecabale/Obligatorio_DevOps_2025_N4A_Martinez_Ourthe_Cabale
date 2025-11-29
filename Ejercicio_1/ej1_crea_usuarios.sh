@@ -162,6 +162,7 @@ while getopts "ic:" opt; do
 done
 ##Al ejecutar getops, nos quedamos con el archivo pasado como parametro en "$1".
 shift $((OPTIND - 1))
+
 ##Verificación del tipo de archivo
 #echo $1
 arch=$1
@@ -176,6 +177,12 @@ elif ! [ -r $arch ]; then
 elif ! [ -s "$arch" ]; then
     echo "¡El archivo esta vacío!" >&2
     exit 5  
+fi
+##Probando que el script se ejecute con permisos de administrador para poder crear usuarios
+# Verificar si el usuario es root
+if [ "$EUID" -ne 0 ]; then
+    echo "Este script necesita ejecutarse con permisos de administrador para poder crear usuarios."
+    exit 6
 fi
 ##Llamamos a la función "crear_usuarios" y "setear_passwd".
 crear_usuarios

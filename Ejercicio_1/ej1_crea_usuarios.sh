@@ -178,8 +178,7 @@ elif ! [ -s "$arch" ]; then
     echo "¡El archivo esta vacío!" >&2
     exit 5  
 fi
-##Probando que el script se ejecute con permisos de administrador para poder crear usuarios
-# Verificar si el usuario es root
+##Verificamos que el script se ejecute con permisos de administrador para poder crear usuarios.
 if [ "$EUID" -ne 0 ]; then
     echo "Este script necesita ejecutarse con permisos de administrador para poder crear usuarios."
     exit 6

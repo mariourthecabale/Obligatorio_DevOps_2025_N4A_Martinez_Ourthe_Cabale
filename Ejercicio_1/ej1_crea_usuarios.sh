@@ -28,9 +28,9 @@ function crear_usuarios {
     for i in $(cat $arch); do
         nombre_usuario=$(echo $i | cut -d: -f1)
         descripcion=$(echo $i | cut -d: -f2)
-        directorio_home=$(echo $i | cut -d: -f3 | awk '{print toupper($0)}') 
+        directorio_home=$(echo $i | cut -d: -f3 | awk '{print tolower($0)}') 
         crear_directorio=$(echo $i| cut -d: -f4 | awk '{print toupper($0)}')
-        shell=$(echo $i | cut -d: -f5 | awk '{print toupper($0)}')
+        shell=$(echo $i | cut -d: -f5 | awk '{print tolower($0)}')
        
         ##Chequeo de que la línea a leer tenga los campos requeridos
         ##Verificar si agregar shell, o dejarla por defecto.
@@ -50,7 +50,7 @@ function crear_usuarios {
         fi
  
         ##Definimos la info por defecto a mostrar, en caso de que sea necesaria cambiarla por error al crear el usuario se cambiará su valor.
-        info=$(echo "Usuario $nombre_usuario creado con exito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell")
+        info=$(echo "Usuario $nombre_usuario creado con éxito con datos indicados:\n\tComentario: $descripcion\n\tDir home: $directorio_home\n\tAsegurado existencia de directorio home: $crear_directorio\n\tShell por defecto: $shell")
        
         ##Validando nombre de usuario.
         if [ -z $nombre_usuario ]; then
@@ -60,7 +60,7 @@ function crear_usuarios {
             crear_directorio="SI"
             #echo $info
         elif ! [[ ($crear_directorio == "SI") || ($crear_directorio == "NO") ]]; then
-            info="¡ATENCIÓN!: El usuario $nombre_usuario no puede ser creado, campo crear directorio no es valido."
+            info="¡ATENCIÓN!: El usuario $nombre_usuario no puede ser creado, campo crear directorio no es válido."
         fi
         
         if (echo $i | egrep -q ^.+:.*:.*:.*:.*$); then
@@ -107,7 +107,7 @@ function crear_usuarios {
                 fi
             fi
         elif ! [ -z $nombre_usuario ]; then
-            info="¡ATENCIÓN!: El usuario $nombre_usuario no puede ser creado ya que la linea no cumple con la cantidad de campos solicitados"
+            info="¡ATENCIÓN!: El usuario $nombre_usuario no puede ser creado ya que la línea no cumple con la cantidad de campos solicitados"
         fi      
      
         ##Mostrar info, si "-i" esta presente.
@@ -153,9 +153,9 @@ while getopts "ic:" opt; do
             setear_passwd=true          
             ;;
         *)
-            ##Verificar que no haya ningun comando incorrecto, si lo hay se debe mostrar un mensaje con el error
-            ##Asignar un codigo de salida "exit 1".
-            echo "¡Los parametros son incorrectos!" >&2
+            ##Verificar que no haya ningún modificador incorrecto, si lo hay se debe mostrar un mensaje con el error
+            ##Asignar un código de salida "exit 1".
+            echo "¡Se ha ingresado al menos un modificador incorrecto!" >&2
             exit 2
             ;;
     esac

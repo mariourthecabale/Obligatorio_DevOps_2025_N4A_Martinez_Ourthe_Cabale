@@ -144,6 +144,11 @@ waiter = ec2.get_waiter('instance_running')
 waiter.wait(InstanceIds=[instance_id])
 print("Instancia ahora está running")
 
+#Obtener la IP pública de la instancia
+desc = ec2.describe_instances(InstanceIds=[instance_id])
+public_ip = desc['Reservations'][0]['Instances'][0].get('PublicIpAddress')
+print(f"La IP pública de la instancia es: {public_ip}")
+
 # Esperar un poco para que el agente SSM se registre
 time.sleep(60)
 

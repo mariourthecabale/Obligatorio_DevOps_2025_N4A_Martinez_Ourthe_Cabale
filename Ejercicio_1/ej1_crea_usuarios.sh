@@ -183,6 +183,9 @@ if [ "$EUID" -ne 0 ]; then
     echo "Este script necesita ejecutarse con permisos de administrador para poder crear usuarios."
     exit 6
 fi
-##Llamamos a la función "crear_usuarios" y "setear_passwd".
+##Llamamos a la función "crear_usuarios".
 crear_usuarios
-setear_passwd
+##Llamamos a la función "setear_passwd" si se ingresó el modificador -c y se pasó una contraseña como parámetro.
+if [ "$set_passwd" = "true" ]; then
+    setear_passwd
+fi

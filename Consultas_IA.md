@@ -332,3 +332,20 @@ enviar_comando_copia(instance_id, bucket, origen, destino)
 * El comando corre **dentro de la instancia EC2**, no en tu máquina.
 
 ---
+## Consulta 6:
+### Prompt:
+en ec2 como hago para que me aparezca mi ip en el script de python el cual levanta mi instancia
+
+### Respuesta:
+#### ✅ Obtener la IP pública desde fuera, usando boto3
+```python
+import boto3
+
+ec2 = boto3.client('ec2')
+
+response = ec2.describe_instances(InstanceIds=['tu-id-de-instancia'])
+
+ip_publica = response['Reservations'][0]['Instances'][0]['PublicIpAddress']
+print("IP pública:", ip_publica)
+```
+---

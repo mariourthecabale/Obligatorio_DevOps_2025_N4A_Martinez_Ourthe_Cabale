@@ -186,6 +186,6 @@ fi
 ##Llamamos a la función "crear_usuarios".
 crear_usuarios
 ##Llamamos a la función "setear_passwd" si se ingresó el modificador -c y se pasó una contraseña como parámetro.
-if [ "$set_passwd" = "true" ]; then
+if [ "$setear_passwd" = "true" ]; then
     setear_passwd
 fi

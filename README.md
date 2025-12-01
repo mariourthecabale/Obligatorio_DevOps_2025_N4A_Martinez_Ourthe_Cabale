@@ -3,6 +3,7 @@
 ## Paso a paso para una correcta ejecución de los ejercicios 1 y 2
 ---
 ## Ejercicio 1
+***Nota: Este ejercicio fue probado únicamente en la versión Ubuntu 24.04***
 
 ### 1. Instalación de Git (solo si no está instalado)
 
@@ -27,19 +28,14 @@ sudo ./ej1_crea_usuarios.sh -i -c "123456789" archivo_con_los_usuarios_a_crear.t
 ```
 ---
 ## Ejercicio 2
-
+***Nota: Este ejercicio fue probado únicamente en la versión Ubuntu 24.04***
 ### Pasos previos para la ejecución del script para desplegar la aplicación
 ### 1. Si no tenes python3, pip y venv.
 
-Ubuntu:
+**Ubuntu:**
 ```bash
 sudo apt install python3-pip python3-venv -y
 ```
-RedHat:
-```bash
-sudo dnf install python3-pip
-```
-
 ### 2. Crear entorno virtual y activarlo
 ```bash
 python3 -m venv .venv
@@ -90,11 +86,8 @@ aws_session_token
 ```
 Para acceder a dichos valores debemos ir a AWS details y en AWS CLI hacemos clic en "Show".
 ![Iniciando Lab](imagenes/1.png)
-
 ![AWS Details](imagenes/2.png)
-
 ![AWS CLI](imagenes/3.png)
-
 ### 6. Configuración del lab de aws en la terminal
 Escribimos:
 ```bash

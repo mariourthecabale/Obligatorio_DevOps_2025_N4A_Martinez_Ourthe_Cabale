@@ -137,5 +137,6 @@ Abrimos el navegador y entramos a ```http://<IP-de-la-instancia>/login.php```
 ```Usuario: admin```
 
 ```Contraseña: admin123```
-![AWS CLI](imagenes/5.png)
+
+![Inicio de sesión](imagenes/5.png)
 ---

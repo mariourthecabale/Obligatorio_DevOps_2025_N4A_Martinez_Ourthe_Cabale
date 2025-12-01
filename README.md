@@ -123,13 +123,13 @@ cd Obligatorio_DevOps_2025_N4A_Martinez_Ourthe_Cabale/Ejercicio_2
 python3 ejercicio_2.py
 ```
 #### 8.3 Proceso de ejecución
-Durante el proceso de ejecución del script debemos intervenir una vez para definir a través de un input la contraseña de la base de datos
+Durante el proceso de ejecución del script debemos intervenir una vez para definir a través de un input la contraseña de la base de datos.
 
 A su vez podemos obtener la IP pública que tendrá la instancia que levantamos, tendremos que tener en cuenta el siguiente print la ip pública va a variar según la instancia creada):
 
 ![AWS CLI](imagenes/4.png)
 
-Una vez que que vemos el mensaje "RDS está disponible" ya estamos en condiciones de probar el acceso a la aplicación.
+Una vez que vemos el mensaje "RDS está disponible" ya estamos en condiciones de probar el acceso a la aplicación.
 ### 9. Acceso a la aplicación
 Abrimos el navegador y entramos a ```http://<IP-de-la-instancia>/login.php```
 
@@ -137,5 +137,5 @@ Abrimos el navegador y entramos a ```http://<IP-de-la-instancia>/login.php```
 ```Usuario: admin```
 
 ```Contraseña: admin123```
-
+![AWS CLI](imagenes/5.png)
 ---

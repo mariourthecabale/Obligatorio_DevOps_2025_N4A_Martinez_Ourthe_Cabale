@@ -85,8 +85,8 @@ aws_secret_access_key
 aws_session_token
 ```
 Para acceder a dichos valores debemos ir a AWS details y en AWS CLI hacemos clic en "Show".
-![Iniciando Lab](imagenes/1.png)
 ![AWS Details](imagenes/2.png)
+
 ![AWS CLI](imagenes/3.png)
 ### 6. Configuración del lab de aws en la terminal
 Escribimos:

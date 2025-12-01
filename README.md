@@ -62,10 +62,6 @@ unzip awscliv2.zip
 ```bash
 sudo ./aws/install
 ```
-#### 4.4 
-```bash
-
-```
 ### 5. Inicializamos el laboratorio de AWS.
 [Inicializamos instancia](https://awsacademy.instructure.com/courses/132413/modules/items/12688742)
 #### 5.1 Iniciamos sesión con nuestra cuenta de AWS Academy.

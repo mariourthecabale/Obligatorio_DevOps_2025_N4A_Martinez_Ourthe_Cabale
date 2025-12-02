@@ -13,3 +13,6 @@ leonardo
 pepe
 paula
 victor
+pepe
+paula
+victor

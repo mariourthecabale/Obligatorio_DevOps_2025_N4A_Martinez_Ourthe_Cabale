@@ -34,6 +34,12 @@ sudo ./ej1_crea_usuarios.sh -i -c "123456789" archivo_con_los_usuarios_a_crear.t
 
 **Ubuntu:**
 ```bash
+sudo apt update
+```
+```bash
+sudo apt upgrade -y
+```
+```bash
 sudo apt install python3-pip python3-venv -y
 ```
 ### 2. Crear entorno virtual y activarlo

@@ -125,7 +125,7 @@ function setear_passwd {
  
     if [ $set_passwd ]; then
         for i in $(cat $usuarios_creados); do
-            echo $i:$password | sudo chpasswd >&2
+            echo $i:$password | sudo chpasswd 2>/dev/null
         done
     fi
     echo "" > "./logs/usuarios_creados.txt"
@@ -136,7 +136,7 @@ if [ "$#" -eq 0 ]; then
     exit 1    
 fi
 if [[ ("$1" == "archivo_con_los_usuarios_a_crear.txt") && ("$#" -gt "1") ]]; then
-    echo "¡Orden incorrecto, recuerda poner primero modificadores!" 2>/dev/null
+    echo "¡Orden incorrecto, recuerda poner primero modificadores!" >&2
     exit 7
 fi
 ##Validación de parámetros pasados al script.
